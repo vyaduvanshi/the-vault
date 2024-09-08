@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Store{% endblock %}
+
+{% block extra_css_and_js %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/store.css') }}">
+<script src="{{ url_for('static', filename='js/store.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Game Store</h1>
+        <div class="game-grid">
+            {% for game in games %}
+                <div class="game-card">
+                    <img src="{{ game.thumbnail }}" alt="{{ game.name }}" class="game-thumbnail">
+                    <h3>{{ game.name }}</h3>
+                    <p>${{ "%.2f"|format(game.price) }}</p>
+                    <button class="add-to-cart" data-id="{{ game.app_id }}">Add to Cart</button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

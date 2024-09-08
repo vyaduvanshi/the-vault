@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block extra_css_and_js %}
+<script src="{{ url_for('static', filename='js/admin.js') }}" defer></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Admin Panel</h1>
+    <div id="error-message" class="error-message" style="display: none;"></div>
+    <div class="link-container">
+        <input type="text" class="game-search" placeholder="Paste a Steam game link here">
+        <button class="add-game">Add Game</button>
+    </div>
+    <div class="game-list">
+        <h2>Current Games</h2>
+        <table class="games-table">
+            <thead>
+                <tr>
+                    <th>Sr No.</th>
+                    <th>Thumbnail</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>App ID</th>
+                    <th>Featured</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><img src="{{ game.thumbnail }}" alt="{{ game.name }}" width="100"></td>
+                        <td>{{ game.name }}</td>
+                        <td>${{ "%.2f"|format(game.price) }}</td>
+                        <td>{{ game.app_id }}</td>
+                        <td>
+                            <input type="checkbox" class="featured-checkbox" data-id="{{ game.app_id }}" {% if game.featured %}checked{% endif %}>
+                        </td>
+                        <td>
+                            <button class="remove-game" data-id="{{ game.app_id }}">Remove</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

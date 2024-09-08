@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Cart{% endblock %}
+
+{% block extra_css_and_js %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+<script src="{{ url_for('static', filename='js/cart.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Your Cart</h1>
+        {% if cart_items %}
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Game</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for item in cart_items %}
+                    <tr>
+                        <td>
+                            <img src="{{ item.game.thumbnail }}" alt="{{ item.game.name }}" class="cart-thumbnail">
+                            {{ item.game.name }}
+                        </td>
+                        <td>${{ "%.2f"|format(item.game.price) }}</td>
+                        <td>
+                            <button class="quantity-btn" data-action="decrease" data-id="{{ item.game.app_id }}">-</button>
+                            <span class="quantity">{{ item.quantity }}</span>
+                            <button class="quantity-btn" data-action="increase" data-id="{{ item.game.app_id }}">+</button>
+                        </td>
+                        <td>${{ "%.2f"|format(item.item_total) }}</td>
+                        <td>
+                            <button class="remove-btn" data-id="{{ item.game.app_id }}">Remove</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="total">Total: ${{ "%.2f"|format(total) }}</p>
+            <button id="clear-cart">Clear Cart</button>
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endif %}
+    </div>
+{% endblock %}
