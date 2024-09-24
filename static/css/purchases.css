@@ -1,0 +1,18 @@
+.purchases-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.purchases-table th, .purchases-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.purchases-table th {
+    background-color: #f2f2f2;
+}
+.game-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+}

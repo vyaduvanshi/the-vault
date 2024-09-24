@@ -1,0 +1,125 @@
+
+
+def extract_list_of_game_urls():
+    """
+    Function to exract list of top steam game URLS via web scraping,
+    to add to the website via the admin panel.
+    """
+    # import requests
+    # from bs4 import BeautifulSoup
+
+
+    res = requests.get("https://steam250.com/most_played",
+                    headers = {
+        'User-Agent': 'Mozilla/5.0'
+    })
+    res.raise_for_status()
+
+
+    soup = BeautifulSoup(res.text, 'html.parser')
+    templist = soup.find_all('a', {'class':'store'}, href=True)
+    templist = [x['href'] for x in templist]
+    templist = templist = [x[:x.find('?')] for x in templist]
+
+
+
+list_of_game_urls = ['https://store.steampowered.com/app/730/',
+ 'https://store.steampowered.com/app/570/',
+ 'https://store.steampowered.com/app/578080/',
+ 'https://store.steampowered.com/app/2923300/',
+ 'https://store.steampowered.com/app/2358720/',
+ 'https://store.steampowered.com/app/1203220/',
+ 'https://store.steampowered.com/app/1172470/',
+ 'https://store.steampowered.com/app/526870/',
+ 'https://store.steampowered.com/app/271590/',
+ 'https://store.steampowered.com/app/252490/',
+ 'https://store.steampowered.com/app/1086940/',
+ 'https://store.steampowered.com/app/2183900/',
+ 'https://store.steampowered.com/app/2139460/',
+ 'https://store.steampowered.com/app/1938090/',
+ 'https://store.steampowered.com/app/236390/',
+ 'https://store.steampowered.com/app/359550/',
+ 'https://store.steampowered.com/app/440/',
+ 'https://store.steampowered.com/app/413150/',
+ 'https://store.steampowered.com/app/2252570/',
+ 'https://store.steampowered.com/app/289070/',
+ 'https://store.steampowered.com/app/1245620/',
+ 'https://store.steampowered.com/app/553850/',
+ 'https://store.steampowered.com/app/230410/',
+ 'https://store.steampowered.com/app/1782210/',
+ 'https://store.steampowered.com/app/381210/',
+ 'https://store.steampowered.com/app/2357570/',
+ 'https://store.steampowered.com/app/221100/',
+ 'https://store.steampowered.com/app/436150/',
+ 'https://store.steampowered.com/app/394360/',
+ 'https://store.steampowered.com/app/251570/',
+ 'https://store.steampowered.com/app/438100/',
+ 'https://store.steampowered.com/app/582010/',
+ 'https://store.steampowered.com/app/646910/',
+ 'https://store.steampowered.com/app/322330/',
+ 'https://store.steampowered.com/app/1222670/',
+ 'https://store.steampowered.com/app/1091500/',
+ 'https://store.steampowered.com/app/1085660/',
+ 'https://store.steampowered.com/app/1293830/',
+ 'https://store.steampowered.com/app/2322010/',
+ 'https://store.steampowered.com/app/108600/',
+ 'https://store.steampowered.com/app/1174180/',
+ 'https://store.steampowered.com/app/227300/',
+ 'https://store.steampowered.com/app/238960/',
+ 'https://store.steampowered.com/app/2977660/',
+ 'https://store.steampowered.com/app/105600/',
+ 'https://store.steampowered.com/app/2195250/',
+ 'https://store.steampowered.com/app/346110/',
+ 'https://store.steampowered.com/app/2074920/',
+ 'https://store.steampowered.com/app/1449850/',
+ 'https://store.steampowered.com/app/2399830/',
+ 'https://store.steampowered.com/app/2878980/',
+ 'https://store.steampowered.com/app/550/',
+ 'https://store.steampowered.com/app/3047030/',
+ 'https://store.steampowered.com/app/1142710/',
+ 'https://store.steampowered.com/app/294100/',
+ 'https://store.steampowered.com/app/1248130/',
+ 'https://store.steampowered.com/app/1621690/',
+ 'https://store.steampowered.com/app/1623730/',
+ 'https://store.steampowered.com/app/39210/',
+ 'https://store.steampowered.com/app/2016590/',
+ 'https://store.steampowered.com/app/261550/',
+ 'https://store.steampowered.com/app/489830/',
+ 'https://store.steampowered.com/app/4000/',
+ 'https://store.steampowered.com/app/2515020/',
+ 'https://store.steampowered.com/app/1599340/',
+ 'https://store.steampowered.com/app/3070070/',
+ 'https://store.steampowered.com/app/275850/',
+ 'https://store.steampowered.com/app/513710/',
+ 'https://store.steampowered.com/app/304930/',
+ 'https://store.steampowered.com/app/1623660/',
+ 'https://store.steampowered.com/app/892970/',
+ 'https://store.steampowered.com/app/284160/',
+ 'https://store.steampowered.com/app/1158310/',
+ 'https://store.steampowered.com/app/8930/',
+ 'https://store.steampowered.com/app/1966720/',
+ 'https://store.steampowered.com/app/813780/',
+ 'https://store.steampowered.com/app/250900/',
+ 'https://store.steampowered.com/app/594650/',
+ 'https://store.steampowered.com/app/281990/',
+ 'https://store.steampowered.com/app/1364780/',
+ 'https://store.steampowered.com/app/1551360/',
+ 'https://store.steampowered.com/app/322170/',
+ 'https://store.steampowered.com/app/1049590/',
+ 'https://store.steampowered.com/app/377160/',
+ 'https://store.steampowered.com/app/582660/',
+ 'https://store.steampowered.com/app/1238810/',
+ 'https://store.steampowered.com/app/1818450/',
+ 'https://store.steampowered.com/app/646570/',
+ 'https://store.steampowered.com/app/218620/',
+ 'https://store.steampowered.com/app/236850/',
+ 'https://store.steampowered.com/app/2709570/',
+ 'https://store.steampowered.com/app/292030/',
+ 'https://store.steampowered.com/app/739630/',
+ 'https://store.steampowered.com/app/1454400/',
+ 'https://store.steampowered.com/app/960090/',
+ 'https://store.steampowered.com/app/2073850/',
+ 'https://store.steampowered.com/app/232090/',
+ 'https://store.steampowered.com/app/990080/',
+ 'https://store.steampowered.com/app/632360/',
+ 'https://store.steampowered.com/app/323190/']

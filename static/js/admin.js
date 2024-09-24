@@ -66,7 +66,6 @@ function createGameRow(game, index) {
     return tr;
 }
 
-// Function to remove a game from the Current Games table
 function removeGame(appId, row) {
     fetch('/remove_game', {
         method: 'POST',
@@ -80,13 +79,14 @@ function removeGame(appId, row) {
         if (data.success) {
             row.remove();
             updateRowNumbers();
+            showError(data.message); // Show success message
         } else {
-            alert('Failed to remove game. Please try again.');
+            showError(data.message || 'Failed to remove game. Please try again.');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        showError('An error occurred. Please try again.');
     });
 }
 

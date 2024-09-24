@@ -2,6 +2,38 @@
 
 {% block title %}Purchases{% endblock %}
 
+{% block extra_css_and_js %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/purchases.css') }}">
+<!-- <script src="{{ url_for('static', filename='js/purchases.js') }}" defer></script> -->
+{% endblock %}
+
 {% block content %}
-    
+    <div class="container">
+        <h1>My Purchases</h1>
+        {% if purchases %}
+            <table class="purchases-table">
+                <thead>
+                    <tr>
+                        <th>Game</th>
+                        <th>Purchase Date</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for purchase in purchases %}
+                    <tr>
+                        <td>
+                            <img src="{{ purchase.game.thumbnail }}" alt="{{ purchase.game.name }}" class="game-thumbnail">
+                            {{ purchase.game.name }}
+                        </td>
+                        <td>{{ purchase.purchase_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>${{ "%.2f"|format(purchase.price) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>You haven't made any purchases yet.</p>
+        {% endif %}
+    </div>
 {% endblock %}
