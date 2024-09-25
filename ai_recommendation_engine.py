@@ -333,7 +333,7 @@ def get_recommendations_main(liked_games, all_games, num_recommendations=6):
     new_sess.run(tf.compat.v1.global_variables_initializer())
 
     # Create a checkpoint reader
-    reader = tf.train.load_checkpoint("rbm_model.ckpt")
+    reader = tf.train.load_checkpoint("the-vault/rbm_model.ckpt")
 
     # Get the variable names and shapes in the checkpoint
     var_to_shape_map = reader.get_variable_to_shape_map()
