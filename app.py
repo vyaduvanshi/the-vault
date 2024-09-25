@@ -9,7 +9,8 @@ import re
 from difflib import get_close_matches
 import random
 
-from ai_recommendation_engine import get_recommendations_main  #This is the AI model
+# from ai_recommendation_engine import get_recommendations_main  #This is the AI model
+import ai_recommendation_engine
 from scraping import list_of_game_urls #need scraping.py file for this import
 
 
@@ -436,10 +437,10 @@ def store():
     
     # Get recommendations
     if liked_game_names:
-        recommended_game_names = get_recommendations_main(
+        recommended_game_names = ai_recommendation_engine.get_recommendations_main(
             liked_game_names,
             all_game_names,
-            num_recommendations=5
+            num_recommendations=15
         )
         
         # Match recommended game names to game objects
@@ -452,8 +453,14 @@ def store():
                 matched_game = next((game for game in all_games if game.name == matched_name), None)
                 if matched_game:
                     recommended_games.append(matched_game)
+            # Break if we have 5 valid recommendations
+            if len(recommended_games) >= 5:
+                break
     else:
         recommended_games = []
+
+    # Limit to 5 recommendations
+    recommended_games = recommended_games[:5]
     
     return render_template('store.html', all_games=all_games, recommended_games=recommended_games)
 
@@ -591,11 +598,29 @@ def get_cart_count():
 #     columns = {table: [col.name for col in db.engine.execute(f'SELECT * FROM {table}').keys()] for table in tables}
 #     return jsonify(columns)
 
+
 def recreate_database():
+    """
+    Function to drop and recreate the database from scratch.
+    For testing purposes
+    """
     with app.app_context():
         db.drop_all()
         db.create_all()
         print("Database recreated successfully.")
+
+
+def get_all_games():
+    """
+    Function to get a list of all games in the DB right now.
+    Used to send a list of games to the AI model, so that the model
+    can be saved and used later, as the server load is too high
+    for it to run on command.
+    """
+    with app.app_context():
+        all_games = Game.query.with_entities(Game.name).all()
+        return [game.name for game in all_games]
+    
 
 if __name__ == '__main__':
     # recreate_database()   # Uncomment this line to recreate the database

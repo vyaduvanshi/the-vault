@@ -3,6 +3,8 @@ import pandas as pd
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
+import app
+
 def load_and_preprocess_data(file_path='gamedata.csv'):
     """
     Load and preprocess the game data from a CSV file.
@@ -155,75 +157,241 @@ def train_rbm(train_list, visible_units, hidden_units=50, epochs=30, batch_size=
     
     return sess, v0, W, vb, hb, prv_w, prv_vb, prv_hb
 
-def get_recommendations(sess, v0, W, vb, hb, prv_w, prv_vb, prv_hb, input_user, games_df):
-    """
-    Generate game recommendations for a given user.
 
-    Args:
-    sess (tf.Session): TensorFlow session.
-    v0, W, vb, hb: TensorFlow placeholders for the RBM model.
-    prv_w, prv_vb, prv_hb: Trained model parameters.
-    input_user (list): Vector representing the input user's game preferences.
-    games_df (pandas.DataFrame): DataFrame with game index.
 
-    Returns:
-    pandas.DataFrame: Sorted DataFrame of games with recommendation scores.
-    """
-    # Forward pass through the RBM
-    hh0 = tf.nn.sigmoid(tf.matmul(v0, W) + hb)
-    vv1 = tf.nn.sigmoid(tf.matmul(hh0, tf.transpose(W)) + vb)
-    feed = sess.run(hh0, feed_dict={v0: input_user, W: prv_w, hb: prv_hb})
-    rec = sess.run(vv1, feed_dict={hh0: feed, W: prv_w, vb: prv_vb})
-    
-    # Add recommendation scores to the games DataFrame
-    games_df["Recommendation Score"] = rec[0]
-    return games_df.sort_values(["Recommendation Score"], ascending=False)
+def train_and_save_model(all_games):
 
-def get_recommendations_main(liked_games, all_games, num_recommendations=6):
-    """
-    Generate game recommendations based on a user's liked games.
-
-    Args:
-    liked_games (list): List of games the user likes.
-    all_games (list): List of all available games.
-    num_recommendations (int): Number of games to recommend. Default is 6.
-
-    Returns:
-    list: List of recommended game names.
-    """
     # Load and preprocess data
     steam_raw = load_and_preprocess_data()
-    
+
     # Create game index
     games_df = create_game_index(all_games)
-    
+
     # Merge game index with steam data
     steam_df = steam_raw.merge(games_df, on='game')
     
     # Prepare training data
     train_list = prepare_training_data(steam_df, games_df)
-    
+
     # Train RBM
     visible_units = len(all_games)
     sess, v0, W, vb, hb, prv_w, prv_vb, prv_hb = train_rbm(train_list, visible_units)
-    
-    # Create input user vector
-    input_user = np.zeros(visible_units)
-    for game in liked_games:
-        if game in games_df['game'].values:
-            index = games_df[games_df['game'] == game]['index_col'].values[0]
-            input_user[index] = 1
-    
-    # Get recommendations
-    recommendations = get_recommendations(sess, v0, W, vb, hb, prv_w, prv_vb, prv_hb, [input_user], games_df)
-    
-    # Filter out games the user already likes
-    unplayed_games = recommendations[~recommendations['game'].isin(liked_games)]
-    
-    return unplayed_games['game'].head(num_recommendations).tolist()
 
-# Example usage:
-# liked_games = ["Game1", "Game2", "Game3"]
-# all_games = ["Game1", "Game2", "Game3", ..., "GameN"]  # List of all games in the dataset
-# recommended_games = recommend_games(liked_games, all_games, num_recommendations=6)
-# print(recommended_games)
+    # Create a dictionary to store the saveable variables
+    saveable_vars = {}
+
+    # Create new variables with the same shapes as the placeholders
+    saveable_vars['W'] = tf.Variable(tf.random.normal([98, 50]), name='W')
+    saveable_vars['vb'] = tf.Variable(tf.zeros([98]), name='vb')  # Adjust shape if different
+    saveable_vars['hb'] = tf.Variable(tf.zeros([50]), name='hb')  # Adjust shape if different
+
+    # For the numpy arrays, we can directly convert them to TensorFlow Variables
+    saveable_vars['prv_w'] = tf.Variable(prv_w, name='prv_w')
+    saveable_vars['prv_vb'] = tf.Variable(prv_vb, name='prv_vb')
+    saveable_vars['prv_hb'] = tf.Variable(prv_hb, name='prv_hb')
+
+    # Initialize the new variables
+    init = tf.compat.v1.global_variables_initializer()
+    sess.run(init)
+
+    # Now create the saver with the saveable variables
+    saver = tf.compat.v1.train.Saver(saveable_vars)
+
+    save_path = saver.save(sess, "rbm_model.ckpt")
+    print(f"Model saved in path: {save_path}")
+
+
+
+# Define the RBM prediction function
+def predict_rbm(v0, W, hb, vb):
+    hidden_probs = tf.nn.sigmoid(tf.matmul(v0, W) + hb)
+    hidden_probs_sample = tf.nn.relu(tf.sign(hidden_probs - tf.random.uniform(tf.shape(hidden_probs))))
+    visible_probs = tf.nn.sigmoid(tf.matmul(hidden_probs_sample, tf.transpose(W)) + vb)
+    return visible_probs
+
+
+
+def get_recommendations_main(liked_games, all_games, num_recommendations=6):
+   
+    # all_games = app.get_all_games() #gets a list of all_games from the web app
+    #Adding a manual list here in case the dimension changes in case of unsuccesful API call from the webapp
+    all_games = ['Counter-Strike 2',
+                'Dota 2',
+                'PUBG: BATTLEGROUNDS',
+                'Banana',
+                'Black Myth: Wukong',
+                'NARAKA: BLADEPOINT',
+                'Apex Legends™',
+                'Satisfactory',
+                'Grand Theft Auto V',
+                'Rust',
+                "Baldur's Gate 3",
+                'Warhammer 40,000: Space Marine 2',
+                'Once Human',
+                'Call of Duty®',
+                'War Thunder',
+                "Tom Clancy's Rainbow Six® Siege",
+                'Team Fortress 2',
+                'Stardew Valley',
+                'Football Manager 2024',
+                "Sid Meier’s Civilization® VI",
+                'ELDEN RING',
+                'HELLDIVERS™ 2',
+                'Warframe',
+                'Crab Game',
+                'Dead by Daylight',
+                'Overwatch® 2',
+                'DayZ',
+                'Governor of Poker 3',
+                'Hearts of Iron IV',
+                '7 Days to Die',
+                'VRChat',
+                'Monster Hunter: World',
+                'The Crew™ 2',
+                "Don't Starve Together",
+                'The Sims™ 4',
+                'Cyberpunk 2077',
+                'Destiny 2',
+                'Forza Horizon 4',
+                'God of War Ragnarök',
+                'Project Zomboid',
+                'Red Dead Redemption 2',
+                'Euro Truck Simulator 2',
+                'Path of Exile',
+                'Cats',
+                'Terraria',
+                'EA SPORTS FC™ 24',
+                'ARK: Survival Evolved',
+                'The First Descendant',
+                'Yu-Gi-Oh! Master Duel',
+                'ARK: Survival Ascended',
+                'NBA 2K25',
+                'Left 4 Dead 2',
+                'Tapple - Idle Clicker',
+                'Total War: WARHAMMER III',
+                'RimWorld',
+                'Farming Simulator 22',
+                'Core Keeper',
+                'Palworld',
+                'FINAL FANTASY XIV Online',
+                'Dark and Darker',
+                'Mount & Blade II: Bannerlord',
+                'The Elder Scrolls V: Skyrim Special Edition',
+                "Garry's Mod",
+                'FINAL FANTASY XVI',
+                'TCG Card Shop Simulator',
+                "No Man's Sky",
+                'SCUM',
+                'Unturned',
+                'MIR4',
+                'Valheim',
+                'BeamNG.drive',
+                'Crusader Kings III',
+                "Sid Meier's Civilization® V",
+                'Lethal Company',
+                'Age of Empires II: Definitive Edition',
+                'The Binding of Isaac: Rebirth',
+                'Hunt: Showdown 1896',
+                'Stellaris',
+                'Street Fighter™ 6',
+                'Forza Horizon 5',
+                'Geometry Dash',
+                'Eternal Return',
+                'Fallout 4',
+                'Battlefield™ V',
+                'STALCRAFT: X',
+                'Slay the Spire',
+                'PAYDAY 2',
+                'Europa Universalis IV',
+                'Supermarket Together',
+                'The Witcher 3: Wild Hunt',
+                'Phasmophobia',
+                'Cookie Clicker',
+                'Bloons TD 6',
+                'THE FINALS',
+                'Killing Floor 2',
+                'Hogwarts Legacy',
+                'Risk of Rain 2',
+                'Frostpunk']
+
+    # Create game_to_index and index_to_game dictionaries
+    game_to_index = {game: index for index, game in enumerate(all_games)}
+    index_to_game = {index: game for game, index in game_to_index.items()}
+
+    # Create a new session
+    new_sess = tf.compat.v1.Session()
+
+    # Create variables with the same names as in your saved model
+    W = tf.Variable(tf.zeros((98, 50)), name="W")
+    vb = tf.Variable(tf.zeros((98,)), name="vb")
+    hb = tf.Variable(tf.zeros((50,)), name="hb")
+    prv_w = tf.Variable(tf.zeros((98, 50)), name="prv_w")
+    prv_vb = tf.Variable(tf.zeros((98,)), name="prv_vb")
+    prv_hb = tf.Variable(tf.zeros((50,)), name="prv_hb")
+
+    # Initialize the variables
+    new_sess.run(tf.compat.v1.global_variables_initializer())
+
+    # Create a checkpoint reader
+    reader = tf.train.load_checkpoint("rbm_model.ckpt")
+
+    # Get the variable names and shapes in the checkpoint
+    var_to_shape_map = reader.get_variable_to_shape_map()
+    print("Variables in checkpoint:", var_to_shape_map)
+
+    # Function to load a variable from the checkpoint
+    def create_and_load_variable(name):
+        shape = var_to_shape_map[name]
+        var = tf.compat.v1.get_variable(name, shape=shape, initializer=tf.zeros_initializer())
+        tensor = reader.get_tensor(name)
+        new_sess.run(tf.compat.v1.assign(var, tensor))
+        return var
+
+    # Try to load each variable
+    try:
+        # Create and load variables
+        W = create_and_load_variable("W")
+        vb = create_and_load_variable("vb")
+        hb = create_and_load_variable("hb")
+        prv_w = create_and_load_variable("prv_w")
+        prv_vb = create_and_load_variable("prv_vb")
+        prv_hb = create_and_load_variable("prv_hb")
+    except Exception as e:
+        print(f"Error loading variable: {e}")
+
+    # Print shapes of loaded variables
+    print("W shape:", new_sess.run(W).shape)
+    print("vb shape:", new_sess.run(vb).shape)
+    print("hb shape:", new_sess.run(hb).shape)
+    print("prv_w shape:", new_sess.run(prv_w).shape)
+    print("prv_vb shape:", new_sess.run(prv_vb).shape)
+    print("prv_hb shape:", new_sess.run(prv_hb).shape)
+
+    # Define the RBM prediction function
+    def predict_rbm(v0):
+        hidden_probs = tf.nn.sigmoid(tf.matmul(v0, W) + hb)
+        hidden_probs_sample = tf.nn.relu(tf.sign(hidden_probs - tf.random.uniform(tf.shape(hidden_probs))))
+        visible_probs = tf.nn.sigmoid(tf.matmul(hidden_probs_sample, tf.transpose(W)) + vb)
+        return visible_probs
+
+    # Create the recommendation function
+    def recommend_games(user_games, top_n=10):
+        v0 = tf.compat.v1.placeholder(tf.float32, shape=(1, 98), name='v0')
+        predictions = predict_rbm(v0)
+        
+        input_vector = np.zeros((1, 98))
+        for game in user_games:
+            if game in game_to_index:
+                input_vector[0, game_to_index[game]] = 1
+
+        recommendations = new_sess.run(predictions, feed_dict={v0: input_vector})
+
+        top_indices = np.argsort(recommendations[0])[::-1][:top_n]
+        recommended_games = [index_to_game[i] for i in top_indices if index_to_game[i] not in user_games]
+
+        return recommended_games[:top_n]
+
+    # Test the recommendation function
+    user_games = liked_games
+    recommendations = recommend_games(user_games)
+    return recommendations
