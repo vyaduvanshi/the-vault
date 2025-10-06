@@ -7,7 +7,7 @@ To see deployed live version of the project - www.vyaduvanshi.pythonanywhere.com
 
 
 
-
+<br><br>
 ## Highlighted Features
 
 ### Recommendation Engine in Action
