@@ -1,0 +1,9 @@
+#temp files
+__pycache__
+.ipynb_checkpoints
+
+#vim files
+.swm
+.swn
+.swo
+.swp
