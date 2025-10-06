@@ -27,10 +27,10 @@ Once a game is added, the engine instantly analyzes the wishlist data and genera
 
 ## Tech stack used
 
-- **Frontend - HTML, CSS, JavaScript:** 
+**Frontend - HTML, CSS, JavaScript:** 
 
 Jinja2 templates render dynamic storefront, checkout, and admin pages, while static assets handle styling and interactive touches like cart counters and wishlist toggles.
-- **Web app backend - Python (Flask + Jinja2):**
+**Web app backend - Python (Flask + Jinja2):**
 
 Flask maps routes, validates forms, exposes JSON endpoints for cart/wishlist updates, and injects shared context into templates through Jinja2.
 - **Database - SQLite:** Persists user profiles (username, email, password hash), purchase history, wishlist relationships, and game metadata (name, description, banner image) inside instance/games.db; SQLAlchemy makes it easy to point at PostgreSQL/MySQL later.
