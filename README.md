@@ -29,8 +29,8 @@ Once a game is added, the engine instantly analyzes the wishlist data and genera
 
 | Area | Tools |
 | --- | --- |
-| Frontend | HTML, CSS, JavaScript, Jinja2 |
-| Web App Backend | Python, Flask |
+| Frontend | HTML, CSS, JavaScript |
+| Web App Backend | Python, Flask, Jinja2 |
 | Database | SQLite, SQLAlchemy |
 | Web Scraping | Requests, BeautifulSoup |
 | Data Manipulation | NumPy, Pandas |
