@@ -4,10 +4,8 @@ A digital games marketplace with an AI recommendation engine.
 
 To see deployed live version of the project - www.vyaduvanshi.pythonanywhere.com
 
+<br>
 
-
-
-<br><br>
 ## Highlighted Features
 
 ### Recommendation Engine in Action
@@ -17,29 +15,31 @@ When the wishlist is empty, no recommendations are shown.
 Once a game is added, the engine instantly analyzes the wishlist data and generates personalized suggestions.
 
 ![AI Recommendations in Action](assets/recommendation_engine.gif)
-*The RBM-powered engine injects personalised recommendations the moment a user starts wishlisting titles.*
 
-### Other Pages
+### Home Page
 
 ![Storefront Overview](assets/homepage.png)
-*Explore featured titles, search results, and quick-add actions right from the landing view.*
 
+### Admin Panel
 ![Admin Dashboard](assets/admin_panel.png)
-*Administrators curate the catalogue, toggle featured status, and review scraped imports from a single panel.*
 
+<br>
 
+## Tech stack used
 
-## (Tech Stack)
-
-- **Frontend - HTML, CSS, JavaScript:** Jinja2 templates render dynamic storefront, checkout, and admin pages, while static assets handle styling and interactive touches like cart counters and wishlist toggles.
-- **Web app backend - Python (Flask + Jinja2):** Flask maps routes, validates forms, exposes JSON endpoints for cart/wishlist updates, and injects shared context into templates through Jinja2.
+- **Frontend - HTML, CSS, JavaScript:** 
+Jinja2 templates render dynamic storefront, checkout, and admin pages, while static assets handle styling and interactive touches like cart counters and wishlist toggles.
+- **Web app backend - Python (Flask + Jinja2):**
+Flask maps routes, validates forms, exposes JSON endpoints for cart/wishlist updates, and injects shared context into templates through Jinja2.
 - **Database - SQLite:** Persists user profiles (username, email, password hash), purchase history, wishlist relationships, and game metadata (name, description, banner image) inside instance/games.db; SQLAlchemy makes it easy to point at PostgreSQL/MySQL later.
 - **Web scraping / API calls - Requests:** scraping.py uses Requests (with optional BeautifulSoup parsing) to fetch Steam listings that admins can bulk import directly into the catalog.
 - **Data manipulation - NumPy & Pandas:** Power the recommendation engine preprocessing pipeline, turning raw CSV gameplay logs into clean user/game matrices and feature frames.
 - **Graphing - Plotly:** Supports exploratory notebooks that visualise catalog trends and model performance when presenting insights.
 - **Artificial Intelligence - Python, Jupyter, Keras, TensorFlow:** Notebook-driven experiments train the RBM with TensorFlow/Keras tooling, while the Flask app loads the exported checkpoint for real-time recommendations.
 
-## Recommendation Engine (Restricted Boltzmann Machine)
+<br>
+
+## How the recommendation engine works (Restricted Boltzmann Machine)
 
 A Restricted Boltzmann Machine (RBM) is a type of neural network that learns hidden patterns in data.
 In a recommendation system, RBMs help predict what items a user might enjoy next by learning relationships between users and items.
